@@ -1,5 +1,7 @@
-import 'dart:ffi';
+import 'dart:io';
 
+import 'package:catmaster_app/network/http_client.dart';
+import 'package:catmaster_app/widget/progress_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -27,10 +29,13 @@ class LoginField extends StatefulWidget {
 
 class LoginFieldState extends State<LoginField> {
   FocusNode _phoneFn, _passwdFn;
+  TextEditingController _phoneCtrl,_passwordCtrl;
   @override
   void initState() {
     _phoneFn = FocusNode();
     _passwdFn = FocusNode();
+    _phoneCtrl = TextEditingController();
+    _passwordCtrl = TextEditingController();
   }
 
   @override
@@ -48,6 +53,7 @@ class LoginFieldState extends State<LoginField> {
                 prefixIcon: Icon(Icons.phone), hintText: "请输入手机号码"),
             keyboardType: TextInputType.phone,
             maxLength: 11,
+            controller: _phoneCtrl,
             focusNode: _phoneFn,
             textInputAction: TextInputAction.next,
             onFieldSubmitted: (term) {
@@ -60,13 +66,15 @@ class LoginFieldState extends State<LoginField> {
           focusNode: _passwdFn,
           keyboardType: TextInputType.visiblePassword,
           maxLength: 20,
+          controller: _passwordCtrl,
           textInputAction: TextInputAction.done,
         ),
         Padding(
             padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
             child: RaisedButton(
                 onPressed: () {
-                  Fluttertoast.showToast(msg: "点击了登陆");
+                  ProgressDialog.showProgress(context);
+                  login(_phoneCtrl.text,_passwordCtrl.text);
                 },
                 child: Text(
                   "登陆",
@@ -86,5 +94,14 @@ class LoginFieldState extends State<LoginField> {
         Text("微信快速登陆")
       ],
     );
+  }
+
+  void login(String userName,String password){
+    RestClient().login(userName, password, (data){
+
+    },(responseCode,errorCode,description){
+      Fluttertoast.showToast(msg: "responseCode ${responseCode}");
+      ProgressDialog.dismiss(context);
+    });
   }
 }
