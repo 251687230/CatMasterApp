@@ -1,35 +1,36 @@
-import 'package:catmaster_app/network/http_client.dart';
-import 'package:catmaster_app/utils/rx_util.dart';
-import 'package:catmaster_app/widget/progress_dialog.dart';
+import 'package:catmaster_app/constants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:catmaster_app/utils/rx_util.dart';
+import 'package:catmaster_app/widget/progress_dialog.dart';
 
-class LoginPage extends StatelessWidget {
+class RegisterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: Container(
       color: Colors.white,
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(32, 100, 32, 10),
-      child: LoginField(),
+      padding: EdgeInsets.fromLTRB(32, 20, 32, 10),
+      child: RegisterField(),
     ));
   }
 }
 
-class LoginField extends StatefulWidget {
+class RegisterField extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return LoginFieldState();
+    return RegisterFiledState();
   }
 }
 
-class LoginFieldState extends State<LoginField> {
+class RegisterFiledState extends State<RegisterField> {
   FocusNode _phoneFn, _passwdFn;
   TextEditingController _phoneCtrl, _passwordCtrl;
   GlobalKey formKey = new GlobalKey<FormState>();
+  String _captchaHint = "获取验证码";
   @override
   void initState() {
     _phoneFn = FocusNode();
@@ -43,18 +44,34 @@ class LoginFieldState extends State<LoginField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        SvgPicture.asset("assets/logo.svg", width: 60, height: 60),
+        Container(
+            alignment: Alignment.topLeft,
+            width: double.infinity,
+            child: IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios,
+                  color: Colors.grey,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                })),
+        Padding(
+          padding: EdgeInsets.fromLTRB(0, 40, 0, 0),
+          child: SvgPicture.asset("assets/logo.svg", width: 60, height: 60),
+        ),
         Padding(
             padding: EdgeInsets.fromLTRB(0, 20, 0, 30),
-            child: Text("喵管家",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30))),
+            child: SvgPicture.asset(
+              "assets/logo_name.svg",
+              width: 116,
+              height: 37.2,
+            )),
         Form(
             key: formKey,
             autovalidate: true,
             child: Column(children: <Widget>[
               TextFormField(
-                  decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.phone), hintText: "请输入手机号码"),
+                  decoration: const InputDecoration(hintText: "请输入手机号码"),
                   keyboardType: TextInputType.phone,
                   validator: (text) {
                     return text.trim().length > 0 ? null : "手机号不能为空";
@@ -67,9 +84,37 @@ class LoginFieldState extends State<LoginField> {
                     _phoneFn.unfocus();
                     FocusScope.of(context).requestFocus(_passwdFn);
                   }),
+              Stack(
+                alignment: Alignment.bottomRight,
+                children: <Widget>[
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      hintText: "请输入验证码",
+                    ),
+                  ),
+                  Positioned(
+                      bottom: 10,
+                      child: SizedBox(
+                        child: OutlineButton(
+                          child: Text(
+                            _captchaHint,
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColor),
+                          ),
+                          highlightColor: Colors.pink[100],
+                          borderSide: BorderSide(
+                              style: BorderStyle.solid,
+                              color: Theme.of(context).primaryColor,
+                              width: 1),
+                          onPressed: () {},
+                        ),
+                        width: 110,
+                        height: 32,
+                      ))
+                ],
+              ),
               TextFormField(
-                decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.lock), hintText: "请输入密码"),
+                decoration: const InputDecoration(hintText: "请输入密码"),
                 focusNode: _passwdFn,
                 keyboardType: TextInputType.visiblePassword,
                 maxLength: 20,
@@ -83,7 +128,7 @@ class LoginFieldState extends State<LoginField> {
               Padding(
                   padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
                   child: RaisedButton(
-                      onPressed: RxUtil.debounce((){
+                      onPressed: RxUtil.debounce(() {
                         if ((formKey.currentState as FormState).validate()) {
                           _phoneFn.unfocus();
                           _passwdFn.unfocus();
@@ -95,41 +140,18 @@ class LoginFieldState extends State<LoginField> {
                                   text: "账号登录中…",
                                 );
                               });
-                          login(_phoneCtrl.text, _passwordCtrl.text);
-                        }else{
-                          Fluttertoast.showToast(msg: "请检查您的输入",toastLength: Toast.LENGTH_SHORT);
+                          //login(_phoneCtrl.text, _passwordCtrl.text);
+                        } else {
+                          Fluttertoast.showToast(
+                              msg: "请检查您的输入", toastLength: Toast.LENGTH_SHORT);
                         }
-                      },1000),
+                      }, 1000),
                       child: Text(
-                        "登陆",
+                        "立即注册",
                         style: TextStyle(color: Colors.white),
                       ))),
             ])),
-        Row(
-          children: <Widget>[
-            Expanded(
-                child:
-                    InkWell(child:Container(child:Text("忘记密码?", style: TextStyle(color: Colors.pinkAccent)),
-                    )
-                    ,onTap: (){
-                      Fluttertoast.showToast(msg: "forget pswd");
-                      },),
-            ),
-            Expanded(
-                child: Text("新用户注册",
-                    textAlign: TextAlign.end,
-                    style: TextStyle(color: Colors.pinkAccent))),
-          ],
-        ),
       ],
     );
-  }
-
-  void login(String userName, String password) {
-    RestClient().login(userName, password, (data) {},
-        (responseCode, errorCode, description) {
-      Fluttertoast.showToast(msg: "responseCode ${responseCode}");
-      Navigator.pop(context);
-    });
   }
 }

@@ -1,6 +1,6 @@
 
 class Constants{
-  String mainColor = "#f7999f";
+  static const int mainColor = 0xf7999f;
 
   static const String BASE_URL = "http://192.168.1.1:8080";
 
