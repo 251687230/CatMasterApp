@@ -13,8 +13,25 @@ class RegisterPage extends StatelessWidget {
         body: Container(
       color: Colors.white,
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(32, 20, 32, 10),
-      child: RegisterField(),
+      padding: EdgeInsets.fromLTRB(10, 40, 32, 10),
+      child: Column(
+        children: <Widget>[
+          Container(
+              alignment: Alignment.topLeft,
+              width: double.infinity,
+              child: IconButton(
+                  icon: Icon(
+                    Icons.arrow_back_ios,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  })),
+          Padding(padding: EdgeInsets.fromLTRB(22, 0, 0, 0),
+          child: RegisterField(),)
+
+        ],
+      )
     ));
   }
 }
@@ -44,19 +61,8 @@ class RegisterFiledState extends State<RegisterField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        Container(
-            alignment: Alignment.topLeft,
-            width: double.infinity,
-            child: IconButton(
-                icon: Icon(
-                  Icons.arrow_back_ios,
-                  color: Colors.grey,
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                })),
         Padding(
-          padding: EdgeInsets.fromLTRB(0, 40, 0, 0),
+          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
           child: SvgPicture.asset("assets/logo.svg", width: 60, height: 60),
         ),
         Padding(
@@ -91,9 +97,11 @@ class RegisterFiledState extends State<RegisterField> {
                     decoration: const InputDecoration(
                       hintText: "请输入验证码",
                     ),
+                    maxLength: 6,
+                    keyboardType: TextInputType.number,
                   ),
                   Positioned(
-                      bottom: 10,
+                      bottom: 30,
                       child: SizedBox(
                         child: OutlineButton(
                           child: Text(
