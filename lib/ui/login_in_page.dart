@@ -1,12 +1,13 @@
 import 'package:catmaster_app/network/http_client.dart';
+import 'package:catmaster_app/ui/edit_psd_page.dart';
 import 'package:catmaster_app/ui/register_page.dart';
 import 'package:catmaster_app/utils/device_util.dart';
-import 'package:catmaster_app/utils/rx_util.dart';
 import 'package:catmaster_app/widget/progress_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:oktoast/oktoast.dart';
+import 'package:rxdart/rxdart.dart';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -33,6 +34,8 @@ class LoginFieldState extends State<LoginField> {
   TextEditingController _phoneCtrl, _passwordCtrl;
   GlobalKey formKey = new GlobalKey<FormState>();
   String _versionName = "";
+  bool _psdVisibility = false;
+  final _loginPublish = BehaviorSubject<int>();
 
   @override
   void initState() {
@@ -44,6 +47,23 @@ class LoginFieldState extends State<LoginField> {
       setState(() {
         _versionName = version;
       });
+    });
+    _loginPublish.throttle((_) => TimerStream(true, Duration(seconds: 1))).listen((data){
+      if ((formKey.currentState as FormState).validate()) {
+        _phoneFn.unfocus();
+        _passwdFn.unfocus();
+        showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) {
+              return new LoadingDialog(
+                text: "账号登录中…",
+              );
+            });
+        login(_phoneCtrl.text, _passwordCtrl.text);
+      } else {
+        showToast("请检查您的输入");
+      }
     });
   }
 
@@ -80,8 +100,16 @@ class LoginFieldState extends State<LoginField> {
                     FocusScope.of(context).requestFocus(_passwdFn);
                   }),
               TextFormField(
-                decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.lock), hintText: "请输入密码"),
+                decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.lock),
+                    hintText: "请输入密码",
+                    suffixIcon: IconButton(icon: Icon(_psdVisibility?Icons.visibility:
+                    Icons.visibility_off),onPressed: (){
+                      setState(() {
+                        _psdVisibility = !_psdVisibility;
+                      });
+                    },)),
+                obscureText: !_psdVisibility,
                 focusNode: _passwdFn,
                 keyboardType: TextInputType.visiblePassword,
                 maxLength: 20,
@@ -90,29 +118,11 @@ class LoginFieldState extends State<LoginField> {
                 },
                 controller: _passwordCtrl,
                 textInputAction: TextInputAction.done,
-                obscureText: true,
               ),
               Padding(
                   padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
                   child: RaisedButton(
-                      onPressed: RxUtil.debounce(() {
-                        if ((formKey.currentState as FormState).validate()) {
-                          _phoneFn.unfocus();
-                          _passwdFn.unfocus();
-                          showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (BuildContext context) {
-                                return new LoadingDialog(
-                                  text: "账号登录中…",
-                                );
-                              });
-                          login(_phoneCtrl.text, _passwordCtrl.text);
-                        } else {
-                          Fluttertoast.showToast(
-                              msg: "请检查您的输入", toastLength: Toast.LENGTH_SHORT);
-                        }
-                      }, 1000),
+                      onPressed: (){_loginPublish.add(1);},
                       child: Text(
                         "登陆",
                         style: TextStyle(color: Colors.white),
@@ -128,7 +138,7 @@ class LoginFieldState extends State<LoginField> {
                 ),
                 onTap: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return RegisterPage();
+                    return EditPsdPage();
                   }));
                 },
               ),
@@ -160,9 +170,10 @@ class LoginFieldState extends State<LoginField> {
   }
 
   void login(String userName, String password) {
-    RestClient().login(userName, password, (data) {},
-        (responseCode, errorCode, description) {
-      Fluttertoast.showToast(msg: "responseCode ${responseCode}");
+    RestClient().login(userName, password, (data) {
+      showToast("登录成功");
+    }, (responseCode, description) {
+      showToast(description);
       Navigator.pop(context);
     });
   }

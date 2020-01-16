@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
 import 'ui/login_in_page.dart';
+import 'package:oktoast/oktoast.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return OKToast(child:MaterialApp(
       title: "喵管家",
         home: LoginPage(),
       theme: ThemeData(
@@ -16,6 +17,6 @@ class MyApp extends StatelessWidget {
         ,buttonColor: Colors.pinkAccent,focusColor: Colors.pink,
         hoverColor: Colors.pink),
       ),
-    );
+    ));
   }
 }
