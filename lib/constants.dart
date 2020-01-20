@@ -21,4 +21,8 @@ class Constants{
   static const int ERROR_SERVICE_EXCEPTION = -1;
 
   static const String KEY_SEND_TIME = "send_time";
+
+  static const String KEY_TOKEN = "token";
+
+  static const String KEY_STORES = "stores";
 }

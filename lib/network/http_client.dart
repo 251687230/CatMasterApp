@@ -36,7 +36,7 @@ class RestClient {
       HttpFail onFail) async {
     FormData formData =  FormData.from({
       "UserName": userName,
-      "Passowrd": SecretUtil.generateMd5(password)
+      "Password": SecretUtil.generateMd5(password)
     });
     doRequest(TYPE_POST,Constants.LOGIN_URL, formData, onSuccess, onFail);
   }
@@ -93,7 +93,7 @@ class RestClient {
   void register(String phoneNum,String password,String captcha,HttpSuccess onSuccess,HttpFail onFail) async{
     FormData formData =  FormData.from({
       "UserName": phoneNum,
-      "Password": password
+      "Password": SecretUtil.generateMd5(password)
     });
     doRequest(TYPE_POST,Constants.REGISTER_URL, formData, onSuccess, onFail);
   }

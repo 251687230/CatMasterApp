@@ -10,10 +10,14 @@ import 'package:oktoast/oktoast.dart';
 import '../constants.dart';
 
 class EditPsdPage extends StatelessWidget {
+  int type;
+
+  EditPsdPage({this.type});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("找回密码"),),
+      appBar: AppBar(title: Text(type == 0?"找回密码":"修改密码"),),
       body: Padding(padding: EdgeInsets.fromLTRB(32,16,32,0),
       child: EditPsdField(),),
     );

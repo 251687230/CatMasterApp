@@ -1,5 +1,7 @@
+import 'package:catmaster_app/constants.dart';
 import 'package:catmaster_app/network/http_client.dart';
 import 'package:catmaster_app/ui/edit_psd_page.dart';
+import 'package:catmaster_app/ui/main_menu_page.dart';
 import 'package:catmaster_app/ui/register_page.dart';
 import 'package:catmaster_app/utils/device_util.dart';
 import 'package:catmaster_app/widget/progress_dialog.dart';
@@ -8,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -39,6 +42,7 @@ class LoginFieldState extends State<LoginField> {
 
   @override
   void initState() {
+    super.initState();
     _phoneFn = FocusNode();
     _passwdFn = FocusNode();
     _phoneCtrl = TextEditingController();
@@ -138,7 +142,7 @@ class LoginFieldState extends State<LoginField> {
                 ),
                 onTap: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return EditPsdPage();
+                    return EditPsdPage(type: 0,);
                   }));
                 },
               ),
@@ -172,9 +176,22 @@ class LoginFieldState extends State<LoginField> {
   void login(String userName, String password) {
     RestClient().login(userName, password, (data) {
       showToast("登录成功");
+      saveLoginInfo(data);
+      Navigator.pop(context);
+      Navigator.push(context, MaterialPageRoute(
+        builder: (context){
+          return MainMenuPage();
+        }
+      ));
     }, (responseCode, description) {
       showToast(description);
       Navigator.pop(context);
     });
+  }
+
+  void saveLoginInfo(var data) async{
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString(Constants.KEY_TOKEN, data["sessionToken"]);
+    sharedPreferences.setString(Constants.KEY_STORES, data["stores"]);
   }
 }
