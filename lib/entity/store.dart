@@ -1,5 +1,5 @@
 class Store {
-  int id;
+  String id;
   String name;
   String contactPhone;
   String contact;

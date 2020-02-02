@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return OKToast(child:MaterialApp(
       title: "喵管家",
-        home: MainMenuPage(),
+        home: LoginPage(),
       theme: ThemeData(
         primarySwatch: Colors.pink,
         buttonTheme: ButtonThemeData(minWidth: double.infinity,height: 40

@@ -6,7 +6,7 @@ class Constants{
 
   static const String VERIFE_KEY = "zous.catmaster@2019";
 
-  static const String BASE_URL = "http://192.168.1.195:80";
+  static const String BASE_URL = "http://192.168.0.103:80";
 
   static const String LOGIN_URL = BASE_URL + "/account/login";
 
@@ -17,6 +17,8 @@ class Constants{
   static const String REGISTER_URL = BASE_URL + "/account/register";
 
   static const String EDIT_PWD_URL = BASE_URL + "/account/changePassword";
+
+  static const String UPLOAD_FILE_URL = BASE_URL + "/file/upload";
 
   static const int ERROR_SERVICE_EXCEPTION = -1;
 

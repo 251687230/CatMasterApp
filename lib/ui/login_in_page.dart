@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:catmaster_app/constants.dart';
 import 'package:catmaster_app/network/http_client.dart';
 import 'package:catmaster_app/ui/edit_psd_page.dart';
@@ -190,8 +192,10 @@ class LoginFieldState extends State<LoginField> {
   }
 
   void saveLoginInfo(var data) async{
+    var jsonData = jsonDecode(data);
+
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.setString(Constants.KEY_TOKEN, data["sessionToken"]);
-    sharedPreferences.setString(Constants.KEY_STORES, data["stores"]);
+    sharedPreferences.setString(Constants.KEY_TOKEN, jsonData["sessionToken"]);
+    sharedPreferences.setString(Constants.KEY_STORES, jsonData["stores"]);
   }
 }

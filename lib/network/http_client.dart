@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:catmaster_app/constants.dart';
@@ -38,14 +39,14 @@ class RestClient {
       "UserName": userName,
       "Password": SecretUtil.generateMd5(password)
     });
-    doRequest(TYPE_POST,Constants.LOGIN_URL, formData, onSuccess, onFail);
+    doRequest(TYPE_POST,null,Constants.LOGIN_URL, formData, onSuccess, onFail);
   }
 
   void getCaptcha(String phoneNum,HttpFail onFail) async{
     FormData formData =  FormData.from({
       "PhoneNum": phoneNum
     });
-    doRequest(TYPE_GET,Constants.GET_CAPTCHA_URL, formData, null, onFail);
+    doRequest(TYPE_GET,null,Constants.GET_CAPTCHA_URL, formData, null, onFail);
   }
 
   void verifyCaptcha(String phoneNum,String captcha,HttpSuccess onSuccess,HttpFail onFail) async{
@@ -53,7 +54,24 @@ class RestClient {
       "PhoneNum": phoneNum,
       "Captcha": captcha
     });
-    doRequest(TYPE_GET,Constants.VERIFY_CAPTCHA_URL, formData, onSuccess, onFail);
+    doRequest(TYPE_GET,null,Constants.VERIFY_CAPTCHA_URL, formData, onSuccess, onFail);
+  }
+
+  void saveStore(String token,String store,HttpSuccess onSuccess,HttpFail onFail){
+    FormData formData = FormData.from({
+      "Store":store
+    });
+    var heads = {"Token":token, "Content-Type" : "application/json" };
+    doRequest(TYPE_POST,heads, Constants.UPLOAD_FILE_URL, formData, onSuccess, onFail);
+  }
+
+  void uploadFile(String token,File file,String fileName,HttpSuccess onSuccess,HttpFail onFail){
+    FormData formData = FormData.from({
+      "file": UploadFileInfo(file,fileName),
+    }
+    );
+    var heads = {"Token":token};
+    doRequest(TYPE_POST,heads, Constants.UPLOAD_FILE_URL, formData, onSuccess, onFail);
   }
 
   void editPassword(String phoneNum,String password,HttpSuccess onSuccess,HttpFail onFail)  {
@@ -61,16 +79,17 @@ class RestClient {
       "UserName": phoneNum,
       "NewPassword": SecretUtil.generateMd5(password)
     });
-    doRequest(TYPE_POST,Constants.EDIT_PWD_URL, formData, onSuccess, onFail);
+    doRequest(TYPE_POST,null,Constants.EDIT_PWD_URL, formData, onSuccess, onFail);
   }
 
-  void doRequest(int type,String url,FormData formData,HttpSuccess onSuccess,HttpFail onFail) async{
+
+  void doRequest(int type,Map<String,dynamic> headers,String url,FormData formData,HttpSuccess onSuccess,HttpFail onFail) async{
     try{
       var response;
       if(type == TYPE_GET){
-        response = await  _dio.get(url, data: formData,options: _addHead());
+        response = await  _dio.get(url, data: formData,options: _addHead(headers));
       }else{
-        response = await  _dio.post(url, data: formData,options: _addHead());
+        response = await  _dio.post(url, data: formData,options: _addHead(headers));
       }
       var _content = response.data;
       int responseCode = response.statusCode;
@@ -95,14 +114,20 @@ class RestClient {
       "UserName": phoneNum,
       "Password": SecretUtil.generateMd5(password)
     });
-    doRequest(TYPE_POST,Constants.REGISTER_URL, formData, onSuccess, onFail);
+    doRequest(TYPE_POST,null,Constants.REGISTER_URL, formData, onSuccess, onFail);
   }
 
-  Options _addHead(){
+  Options _addHead(Map<String,dynamic> addHeaders){
     String random = Random().nextInt(10000).toString();
     String timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
     String encodeStr = SecretUtil.generateMd5(timeStamp+ random + Constants.VERIFE_KEY);
-    return Options(headers: {'Random':random,'TimeStamp':timeStamp,'EncoderStr': encodeStr});
+
+    Map<String,dynamic> options = {'Random':random,'TimeStamp':timeStamp,'EncoderStr': encodeStr};
+    if(addHeaders != null){
+      options.addAll(addHeaders);
+    }
+
+    return Options(headers: options);
   }
 }
 
