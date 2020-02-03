@@ -21,8 +21,10 @@ class SplashPageState extends State<SplashPage>{
     return Scaffold(body:Container(
         color: Colors.white,
         width: double.infinity,
-        padding: EdgeInsets.fromLTRB(32, 150, 32, 10),
-        child: Column(children:<Widget>[
+        padding: EdgeInsets.fromLTRB(32, 150, 32, 30),
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children:<Widget>[
           Expanded(child:Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
@@ -33,9 +35,14 @@ class SplashPageState extends State<SplashPage>{
                     "assets/logo_name.svg",
                     width: 116,
                     height: 37.2,
+
                   )),
             ],
           )),
+          Padding(child:
+          SvgPicture.asset("assets/slog.svg",width:204.7,height: 96.4,),
+          padding: EdgeInsets.fromLTRB(0, 0, 0 , 50),),
+          Text("Copyright@2020")
         ])
     ));
   }
