@@ -1,5 +1,6 @@
 import 'package:catmaster_app/ui/edit_store_page.dart';
 import 'package:catmaster_app/ui/main_menu_page.dart';
+import 'package:catmaster_app/ui/splash_page.dart';
 import 'package:flutter/material.dart';
 
 import 'ui/login_in_page.dart';
@@ -12,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return OKToast(child:MaterialApp(
       title: "喵管家",
-        home: LoginPage(),
+        home: SplashPage(),
       theme: ThemeData(
         primarySwatch: Colors.pink,
         buttonTheme: ButtonThemeData(minWidth: double.infinity,height: 40

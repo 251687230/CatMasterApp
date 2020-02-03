@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:catmaster_app/entity/store.dart';
@@ -11,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:catmaster_app/constants.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:catmaster_app/widget/progress_dialog.dart';
 
 class EditStorePage extends StatefulWidget {
   @override
@@ -219,8 +221,16 @@ class _EditStoreState extends State<EditStorePage> {
                     }
                     String fixPhone = _fixPhoneCtrl.text.trim();
                     String introduce = _introduceCtrl.text.trim();
-                    //TODO 创建Store对象
-                    //saveStore();
+
+                    Store store = Store();
+                    store.areaCode = areaCode;
+                    store.contact = contact;
+                    store.contactPhone = contactPhone;
+                    store.fixedPhone = fixPhone;
+                    store.detailAddr = area;
+                    store.introduce = introduce;
+                    store.name = storeName;
+                    uploadPic(store);
                   },
                 )
               ])),
@@ -232,18 +242,37 @@ class _EditStoreState extends State<EditStorePage> {
     token =  sharedPreferences.getString(Constants.KEY_TOKEN);
   }
 
-  void saveStore(Store store){
+  void uploadPic(Store store){
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return LoadingDialog(
+            text: "账号登录中…",
+          );
+        });
     if(croppedFile != null) {
       RestClient().uploadFile(token,croppedFile, "store.png", (data) {
-        /*RestClient().saveStore(token, store, (data){
-
-        }, (errorCode, description) {
-
-        });*/
+        store.storeIcon = data;
+        String storeStr = jsonEncode(store);
+        saveStore(storeStr);
       }, (errorCode, description) {
+        Navigator.pop(context);
         showToast(description);
       });
+    }else{
+      String storeStr = jsonEncode(store);
+      saveStore(storeStr);
     }
+  }
+
+  void saveStore(String storeStr){
+    RestClient().saveStore(token, storeStr, (data){
+      print("保存成功 = " + data);
+    }, (errorCode, description) {
+      Navigator.pop(context);
+      showToast(description);
+    });
   }
 
   void showCityPicker() async {

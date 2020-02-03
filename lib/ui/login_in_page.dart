@@ -62,7 +62,7 @@ class LoginFieldState extends State<LoginField> {
             context: context,
             barrierDismissible: false,
             builder: (BuildContext context) {
-              return new LoadingDialog(
+              return LoadingDialog(
                 text: "账号登录中…",
               );
             });
@@ -196,6 +196,7 @@ class LoginFieldState extends State<LoginField> {
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setString(Constants.KEY_TOKEN, jsonData["sessionToken"]);
+    sharedPreferences.setInt(Constants.KEY_TOKEN_SAVE, DateTime.now().millisecondsSinceEpoch);
     sharedPreferences.setString(Constants.KEY_STORES, jsonData["stores"]);
   }
 }
