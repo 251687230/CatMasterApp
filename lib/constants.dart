@@ -20,6 +20,12 @@ class Constants{
 
   static const String UPLOAD_FILE_URL = BASE_URL + "/file/upload";
 
+  static const String SAVE_STORE_URL = BASE_URL + "/business/saveStore";
+
+  static const String REFRESH_TOKEN_URL = BASE_URL + "/account/refreshToken";
+
+  static const String DELETE_STORE_URL = BASE_URL + "/business/deleteStore";
+
   static const int ERROR_SERVICE_EXCEPTION = -1;
 
   static const String KEY_SEND_TIME = "send_time";
@@ -27,6 +33,8 @@ class Constants{
   static const String KEY_TOKEN = "token";
 
   static const String KEY_TOKEN_SAVE = "token_save";
+
+  static const String KEY_SELECT_STORE = "select_store";
 
   static const String KEY_STORES = "stores";
 }

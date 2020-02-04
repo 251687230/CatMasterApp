@@ -182,7 +182,7 @@ class LoginFieldState extends State<LoginField> {
       Navigator.pop(context);
       Navigator.push(context, MaterialPageRoute(
         builder: (context){
-          return MainMenuPage();
+          return MainMenuPage(false);
         }
       ));
     }, (responseCode, description) {
@@ -196,6 +196,7 @@ class LoginFieldState extends State<LoginField> {
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setString(Constants.KEY_TOKEN, jsonData["sessionToken"]);
+    print("Token = " +jsonData["sessionToken"]);
     sharedPreferences.setInt(Constants.KEY_TOKEN_SAVE, DateTime.now().millisecondsSinceEpoch);
     sharedPreferences.setString(Constants.KEY_STORES, jsonData["stores"]);
   }

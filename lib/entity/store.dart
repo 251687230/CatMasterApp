@@ -9,6 +9,7 @@ class Store {
   String introduce;
   String storeIcon;
   List<String> imageUrls;
+  String localUrl;
 
   Store({
       this.id,
@@ -20,7 +21,8 @@ class Store {
       this.detailAddr,
       this.introduce,
       this.storeIcon,
-      this.imageUrls});
+      this.imageUrls,
+  this.localUrl});
 
   factory Store.fromJson(Map<String, dynamic> json) {
     return Store(
@@ -33,6 +35,23 @@ class Store {
         detailAddr: json["detailAddr"],
         introduce: json["introduce"],
         storeIcon: json["storeIcon"],
-        imageUrls: json["imageUrls"]);
+        imageUrls: List<String>.from(json["imageUrls"]),
+        localUrl: json["localUrl"]);
+  }
+
+  Map<String, dynamic> toJson(){
+    Map<String, dynamic> json = Map<String, dynamic>();
+    json["id"] = id;
+    json["name"] = name ;
+    json["contactPhone"] =contactPhone;
+    json["contact"] = contact;
+    json["fixedPhone"] =fixedPhone;
+    json["areaCode"] = areaCode;
+    json["detailAddr"] =detailAddr;
+    json["introduce"] =introduce;
+    json["storeIcon"] = storeIcon;
+    json["imageUrls"] = imageUrls;
+    json["localUrl"] = localUrl;
+    return json;
   }
 }

@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:catmaster_app/constants.dart';
 import 'package:catmaster_app/entity/result.dart';
+import 'package:catmaster_app/entity/store.dart';
 import 'package:catmaster_app/utils/secret_util.dart';
 import 'package:dio/dio.dart';
 
@@ -42,6 +43,19 @@ class RestClient {
     doRequest(TYPE_POST,null,Constants.LOGIN_URL, formData, onSuccess, onFail);
   }
 
+  void refreshToken(String token,HttpSuccess onSuccess,HttpFail onFail){
+    var heads = {"Token":token};
+    doRequest(TYPE_GET,heads, Constants.REFRESH_TOKEN_URL, null, onSuccess, onFail);
+  }
+
+  void deleteStore(String token,String storeId,HttpSuccess onSuccess,HttpFail onFail){
+    FormData formData =  FormData.from({
+      "StoreId": storeId,
+    });
+    var heads = {"Token":token};
+    doRequest(TYPE_POST,heads, Constants.DELETE_STORE_URL, formData, onSuccess, onFail);
+  }
+
   void getCaptcha(String phoneNum,HttpFail onFail) async{
     FormData formData =  FormData.from({
       "PhoneNum": phoneNum
@@ -57,12 +71,9 @@ class RestClient {
     doRequest(TYPE_GET,null,Constants.VERIFY_CAPTCHA_URL, formData, onSuccess, onFail);
   }
 
-  void saveStore(String token,String store,HttpSuccess onSuccess,HttpFail onFail){
-    FormData formData = FormData.from({
-      "Store":store
-    });
-    var heads = {"Token":token, "Content-Type" : "application/json" };
-    doRequest(TYPE_POST,heads, Constants.UPLOAD_FILE_URL, formData, onSuccess, onFail);
+  void saveStore(String token,Store store,HttpSuccess onSuccess,HttpFail onFail){
+    var heads = {"Token":token, "Content-Type" : "application/json;charset=UTF-8" };
+    doRequest(TYPE_POST,heads, Constants.SAVE_STORE_URL, store.toJson(), onSuccess, onFail);
   }
 
   void uploadFile(String token,File file,String fileName,HttpSuccess onSuccess,HttpFail onFail){
@@ -83,7 +94,7 @@ class RestClient {
   }
 
 
-  void doRequest(int type,Map<String,dynamic> headers,String url,FormData formData,HttpSuccess onSuccess,HttpFail onFail) async{
+  void doRequest(int type,Map<String,dynamic> headers,String url,var formData,HttpSuccess onSuccess,HttpFail onFail) async{
     try{
       var response;
       if(type == TYPE_GET){

@@ -1,11 +1,22 @@
+import 'package:catmaster_app/network/http_client.dart';
 import 'package:catmaster_app/ui/home_page.dart';
 import 'package:catmaster_app/ui/manage_page.dart';
 import 'package:catmaster_app/ui/mine_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../constants.dart';
+
+bool _isRefreshToken = false;
 
 class MainMenuPage extends StatefulWidget{
+
+  MainMenuPage(bool refreshToken){
+    _isRefreshToken = refreshToken;
+  }
+
   @override
   _MainMenuPageState createState() => _MainMenuPageState();
 }
@@ -81,5 +92,33 @@ class _MainMenuPageState extends State<MainMenuPage> {
       [getTabImage('assets/manage.svg'), getTabImage('assets/manage_select.svg')],
       [getTabImage('assets/mine.svg'), getTabImage('assets/mine_select.svg')]
     ];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if(_isRefreshToken){
+      refreshToken();
+    }
+  }
+
+  void refreshToken() async{
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var token = sharedPreferences.getString(Constants.KEY_TOKEN);
+    print("requesttoken =" + token );
+    if(token != null) {
+      RestClient().refreshToken(token,(data){
+        saveLoginInfo(data);
+      },(errorCode,description){
+        print("errorCode = " + errorCode.toString() + ",description = " + description);
+      });
+    }
+  }
+
+  void saveLoginInfo(var data) async{
+    print("receiveToken =" + data );
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString(Constants.KEY_TOKEN,data);
+    sharedPreferences.setInt(Constants.KEY_TOKEN_SAVE, DateTime.now().millisecondsSinceEpoch);
   }
 }

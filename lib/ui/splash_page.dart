@@ -67,7 +67,7 @@ class SplashPageState extends State<SplashPage>{
       if(tokenSaveTime != null && DateTime.now().millisecondsSinceEpoch - tokenSaveTime > 640800000){
         jumpPage(LoginPage());
       }else{
-        jumpPage(MainMenuPage());
+        jumpPage(MainMenuPage(true));
       }
     }
   }
