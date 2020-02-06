@@ -51,9 +51,11 @@ class _StoresListState extends State<StoresListPage> {
               List<Store> stores = await Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return EditStorePage();
               }));
-              setState(() {
-                _stores = stores;
-              });
+              if(stores != null) {
+                setState(() {
+                  _stores = stores;
+                });
+              }
             },
           )
         ],
