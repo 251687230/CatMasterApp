@@ -107,7 +107,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
     var token = sharedPreferences.getString(Constants.KEY_TOKEN);
     print("requesttoken =" + token );
     if(token != null) {
-      RestClient().refreshToken(token,(data){
+      RestClient().refreshToken((data){
         saveLoginInfo(data);
       },(errorCode,description){
         print("errorCode = " + errorCode.toString() + ",description = " + description);

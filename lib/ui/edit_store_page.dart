@@ -51,11 +51,11 @@ class _EditStoreState extends State<EditStorePage> {
             width: 36,
             height: 36,
           )
-        : Image.file(
+        : CircleAvatar(backgroundImage:Image.file(
             File(_store.localUrl),
             width: 36,
             height: 36,
-          );
+          ).image,radius: 18);
     getToken();
 
     _storeNameCtrl = TextEditingController();
@@ -73,6 +73,7 @@ class _EditStoreState extends State<EditStorePage> {
       _areaCtrl.text = _store.detailAddr;
       _fixPhoneCtrl.text = _store.fixedPhone;
       _introduceCtrl.text = _store.introduce;
+      areaCode = _store.areaCode;
 
       CityPickerUtil utils = CityPickers.utils();
       Result result = utils.getAreaResultByCode(_store.areaCode);
@@ -338,7 +339,7 @@ class _EditStoreState extends State<EditStorePage> {
             text: "删除中…",
           );
         });
-    RestClient().deleteStore(token, id, (data) {
+    RestClient().deleteStore(id, (data) {
       saveStoreInfo(_store, isDelete: true);
     }, (errorCode, description) {
       Navigator.pop(context);
@@ -356,7 +357,7 @@ class _EditStoreState extends State<EditStorePage> {
           );
         });
     if (croppedFile != null) {
-      RestClient().uploadFile(token, croppedFile, "store.png", (data) {
+      RestClient().uploadFile(croppedFile, "store.png", (data) {
         store.storeIcon = data;
         store.localUrl = localFilePath;
         saveStore(store);
@@ -370,8 +371,9 @@ class _EditStoreState extends State<EditStorePage> {
   }
 
   void saveStore(Store store) {
-    RestClient().saveStore(token, store, (data) {
-      saveStoreInfo(store);
+    RestClient().saveStore(store, (data) {
+      Store returnStore = Store.fromJson(json.decode(data));
+      saveStoreInfo(returnStore);
     }, (errorCode, description) {
       Navigator.pop(context);
       showToast(description);
@@ -379,16 +381,32 @@ class _EditStoreState extends State<EditStorePage> {
   }
 
   void saveStoreInfo(Store store, {bool isDelete = false}) async {
+    if(localFilePath != null){
+      var appDocDir;
+      if(Platform.isIOS){
+        appDocDir = await getApplicationDocumentsDirectory();
+      }else {
+        appDocDir = await getExternalStorageDirectory();
+      }
+      String appDocPath = appDocDir.path;
+
+      File file = File(localFilePath);
+      String newPath = appDocPath + "/store_pic_" + store.id + ".jpg";
+      file.rename(newPath);
+      store.localUrl = newPath;
+    }
+
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String storeStr = sharedPreferences.getString(Constants.KEY_STORES);
     List decodeJson = json.decode(storeStr);
     List<Store> stores = decodeJson.map((m) => new Store.fromJson(m)).toList();
     bool isExit = false;
     if (!isDelete) {
-      for (Store element in stores) {
+      for (int i=0 ; i < stores.length; i++) {
+        Store element = stores[i];
         if (element.id == store.id) {
           isExit = true;
-          element = store;
+          stores[i] = store;
           break;
         }
       }
@@ -457,7 +475,12 @@ class _EditStoreState extends State<EditStorePage> {
 
   void _saveImage(File croppedFile) async {
     try {
-      var appDocDir = await getExternalStorageDirectory();
+      var appDocDir;
+      if(Platform.isIOS){
+        appDocDir = await getApplicationDocumentsDirectory();
+      }else {
+        appDocDir = await getExternalStorageDirectory();
+      }
       String appDocPath = appDocDir.path;
 
       File file = File(appDocPath +

@@ -20,11 +20,15 @@ class Constants{
 
   static const String UPLOAD_FILE_URL = BASE_URL + "/file/upload";
 
+  static const String DOWNLOAD_FILE_URL = BASE_URL + "/file/download";
+
   static const String SAVE_STORE_URL = BASE_URL + "/business/saveStore";
 
   static const String REFRESH_TOKEN_URL = BASE_URL + "/account/refreshToken";
 
   static const String DELETE_STORE_URL = BASE_URL + "/business/deleteStore";
+
+  static const String GET_STORES_URL = BASE_URL + "/business/getStores";
 
   static const int ERROR_SERVICE_EXCEPTION = -1;
 

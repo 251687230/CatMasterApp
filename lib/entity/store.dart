@@ -35,7 +35,7 @@ class Store {
         detailAddr: json["detailAddr"],
         introduce: json["introduce"],
         storeIcon: json["storeIcon"],
-        imageUrls: List<String>.from(json["imageUrls"]),
+        imageUrls: json["imageUrls"]== null?null : List<String>.from(json["imageUrls"]),
         localUrl: json["localUrl"]);
   }
 
