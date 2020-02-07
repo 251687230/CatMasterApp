@@ -1,7 +1,12 @@
+import 'dart:convert';
+
+import 'package:catmaster_app/entity/store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'member_list_page.dart';
+import '../constants.dart';
+import 'customer_list_page.dart';
 
 const String MEMBER_LIST = "会员列表";
 const String VIP_CARD_MANAGE = "会员卡管理";
@@ -13,11 +18,19 @@ const String STORE_INFO = "门店信息";
 const String STAFF = "员工/教练";
 const String STORE_PIC = "门店照片";
 
-class ManagePage extends StatelessWidget {
-  var _context;
+class ManagePage extends StatefulWidget{
+  @override
+  State<StatefulWidget> createState() {
+    return ManagePageState();
+  }
+
+}
+
+class ManagePageState extends State<ManagePage> {
+  List<Store> stores;
+  Store selectStore;
   @override
   Widget build(BuildContext context) {
-    _context = context;
     return Scaffold(
       appBar: AppBar(
         title: Text("管理"),
@@ -102,6 +115,23 @@ class ManagePage extends StatelessWidget {
     );
   }
 
+  void getStoreInfo()async{
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String storeStr = sharedPreferences.getString(Constants.KEY_STORES);
+    String selectStoreId = sharedPreferences.getString(
+        Constants.KEY_SELECT_STORE);
+    List decodeJson = json.decode(storeStr);
+    stores = decodeJson.map((m) => new Store.fromJson(m)).toList();
+    if(stores != null){
+      for(Store item in stores){
+        if(item.id == selectStoreId){
+          selectStore = item;
+          break;
+        }
+      }
+    }
+  }
+
   Widget _createItem(String assetName,String itemName){
     return GestureDetector(child:Column(children: <Widget>[
       SvgPicture.asset(assetName,width: 40,height: 40,),
@@ -112,16 +142,36 @@ class ManagePage extends StatelessWidget {
     });
   }
 
+
   void _jumpPage(String itemName){
-    Widget widget;
-    switch(itemName){
-      case MEMBER_LIST:
-        widget = MemberListPage();
+    if(stores != null && stores.length > 0) {
+      Widget widget;
+      switch(itemName){
+        case MEMBER_LIST:
+          widget = CustomerListPage(selectStore);
+      }
+      if (widget != null) {
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return widget;
+        }));
+      }
+    }else{
+      showDialog(context: context,builder: (ctx){
+        return AlertDialog(title: Text("提示"),
+        content: Text("您还没有任何门店，请先在首页创建门店信息"),
+        actions: <Widget>[
+          FlatButton(child: Text("确定"),onPressed: (){
+            Navigator.pop(ctx);
+          },)
+        ],);
+      });
     }
-    if(widget != null){
-      Navigator.push(_context, MaterialPageRoute(builder: (context){
-        return widget;
-      }));
-    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    print("initState");
+    getStoreInfo();
   }
 }

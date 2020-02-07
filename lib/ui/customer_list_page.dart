@@ -1,16 +1,24 @@
 import 'package:azlistview/azlistview.dart';
+import 'package:catmaster_app/entity/store.dart';
 import 'package:catmaster_app/ui/edit_customer_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class MemberListPage extends StatefulWidget{
+Store _store;
+
+class CustomerListPage extends StatefulWidget{
+
+  CustomerListPage(Store store){
+    _store = store;
+  }
+
   @override
   State<StatefulWidget> createState() {
-    return _MemberListState();
+    return _CustomerListState();
   }
 }
 
-class _MemberListState extends State<MemberListPage>{
+class _CustomerListState extends State<CustomerListPage>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(appBar: AppBar(title: Text("会员"),
@@ -25,7 +33,7 @@ class _MemberListState extends State<MemberListPage>{
       IconButton(icon: Icon(Icons.add,),
       onPressed: (){
         Navigator.push(context, MaterialPageRoute(builder: (context){
-          return EditCustomerPage();
+          return EditCustomerPage(_store);
         }));
       },)
     ],),body:  AzListView(

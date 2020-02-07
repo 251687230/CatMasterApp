@@ -30,7 +30,7 @@ class _HomeState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(title: InkWell(child: Row(
         children: <Widget>[
-          storeIcon,
+          Offstage(child:storeIcon,offstage: stores == null || stores.length == 0,),
           Padding(child: Text(storeName),
             padding: EdgeInsets.fromLTRB(10, 0, 5, 0)
             ,),
@@ -60,7 +60,6 @@ class _HomeState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    print("init state");
     getStores();
   }
 
@@ -98,6 +97,8 @@ class _HomeState extends State<HomePage> {
               }
             }
         }
+      }else{
+        storeName = "新增门店";
       }
     });
   }

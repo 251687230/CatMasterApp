@@ -210,10 +210,14 @@ class _StoresListState extends State<StoresListPage> {
                           child: iconWidget,
                           padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                         ),
+                        Expanded(child:
                         Text(
                           store.name,
+                          softWrap: true,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(fontSize: 20),
-                        ),
+                        )),
                       ],
                     )),
                     IconButton(

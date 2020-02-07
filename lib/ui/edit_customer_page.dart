@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:catmaster_app/entity/store.dart';
 import 'package:catmaster_app/widget/common_bottom_sheet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,13 @@ import 'package:path_provider/path_provider.dart';
 
 typedef DatePickCallback(DateTime date);
 
+Store _store;
+
 class EditCustomerPage extends StatefulWidget {
+  EditCustomerPage(Store store){
+    _store = store;
+  }
+
   @override
   State<StatefulWidget> createState() {
     return EditCustomerState();
@@ -24,6 +31,9 @@ class EditCustomerState extends State<EditCustomerPage> {
   TextEditingController _introduceCtrl = TextEditingController();
 
   int sex = 0;
+
+  String birthStr = "请选择";
+  String joinTimeStr = "请选择";
 
   Widget logoWidget = SvgPicture.asset(
     "assets/customer_header.svg",
@@ -48,7 +58,7 @@ class EditCustomerState extends State<EditCustomerPage> {
             Padding(
               child:
               Center(child:Text(
-                "门店名称",
+                _store.name,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               )),
               padding: EdgeInsets.fromLTRB(0, 12, 0, 12),
@@ -79,14 +89,14 @@ class EditCustomerState extends State<EditCustomerPage> {
               indent: 12,
               endIndent: 12,
             ),
-            createSelectItem("生日", "请选择", clickBirthdayItem),
+            createSelectItem("生日", birthStr, clickBirthdayItem),
             Divider(
               height: 1,
               color: Colors.grey,
               indent: 12,
               endIndent: 12,
             ),
-            createSelectItem("入会时间", "请选择", clickJoinTime),
+            createSelectItem("入会时间", joinTimeStr, clickJoinTime),
             Divider(
               height: 1,
               color: Colors.grey,
@@ -102,7 +112,7 @@ class EditCustomerState extends State<EditCustomerPage> {
                     child: TextField(
                       decoration: InputDecoration(
                         border: InputBorder.none,
-                        hintText: "请输入门店简介",
+                        hintText: "请输入备注信息",
                       ),
                       maxLength: 100,
                       maxLines: null,
@@ -231,7 +241,11 @@ class EditCustomerState extends State<EditCustomerPage> {
   }
 
   void clickBirthdayItem() {
-   showDatePicker((date) {});
+   showDatePicker((date) {
+     setState(() {
+       birthStr = "${date.year}-${date.month}-${date.day}";
+     });
+   });
   }
 
   void showDatePicker(DatePickCallback onDatePick){
@@ -245,7 +259,11 @@ class EditCustomerState extends State<EditCustomerPage> {
   }
 
   void clickJoinTime() {
-    showDatePicker((date) {});
+    showDatePicker((date) {
+      setState(() {
+        joinTimeStr = "${date.year}-${date.month}-${date.day}";
+      });
+    });
   }
 
   Widget createSelectItem(String title, String hintText, Function function) {

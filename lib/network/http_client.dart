@@ -37,7 +37,8 @@ class RestClient {
   void login(String userName, String password, HttpSuccess onSuccess,
       HttpFail onFail) async {
     FormData formData = FormData.from(
-        {"UserName": userName, "Password": SecretUtil.generateMd5(password)});
+        {"UserName": userName, "Password": SecretUtil.generateMd5(password),
+        "Role":"manager"});
     doRequest(
         TYPE_POST, null, Constants.LOGIN_URL, formData, onSuccess, onFail);
   }
