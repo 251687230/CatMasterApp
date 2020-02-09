@@ -123,10 +123,14 @@ class ManagePageState extends State<ManagePage> {
     List decodeJson = json.decode(storeStr);
     stores = decodeJson.map((m) => new Store.fromJson(m)).toList();
     if(stores != null){
-      for(Store item in stores){
-        if(item.id == selectStoreId){
-          selectStore = item;
-          break;
+      if(selectStoreId == null){
+        selectStore = stores[0];
+      }else {
+        for (Store item in stores) {
+          if (item.id == selectStoreId) {
+            selectStore = item;
+            break;
+          }
         }
       }
     }

@@ -1,7 +1,10 @@
 import 'dart:io';
 
+import 'package:catmaster_app/entity/customer.dart';
 import 'package:catmaster_app/entity/store.dart';
+import 'package:catmaster_app/network/http_client.dart';
 import 'package:catmaster_app/widget/common_bottom_sheet.dart';
+import 'package:catmaster_app/widget/progress_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
@@ -9,10 +12,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:oktoast/oktoast.dart';
 
 typedef DatePickCallback(DateTime date);
 
 Store _store;
+Customer _customer;
+var croppedFile;
 
 class EditCustomerPage extends StatefulWidget {
   EditCustomerPage(Store store){
@@ -28,12 +34,15 @@ class EditCustomerPage extends StatefulWidget {
 class EditCustomerState extends State<EditCustomerPage> {
   TextEditingController _nameCtrl = TextEditingController();
   TextEditingController _phoneCtrl = TextEditingController();
-  TextEditingController _introduceCtrl = TextEditingController();
+  TextEditingController _remarksCtrl = TextEditingController();
 
   int sex = 0;
 
   String birthStr = "请选择";
   String joinTimeStr = "请选择";
+
+  int birthday = -1,joinTime = -1;
+  String localFilePath;
 
   Widget logoWidget = SvgPicture.asset(
     "assets/customer_header.svg",
@@ -49,9 +58,9 @@ class EditCustomerState extends State<EditCustomerPage> {
         ),
         body: Padding(
           child: Center(
-              child: ListView(children: <Widget>[
+              child: SingleChildScrollView(child:Column(children: <Widget>[
                 GestureDetector(child:
-                logoWidget,
+                SizedBox(child:logoWidget,height: 60,width: 60,),
                   onTap: clickHeadPhoto,
                 )
            ,
@@ -116,7 +125,7 @@ class EditCustomerState extends State<EditCustomerPage> {
                       ),
                       maxLength: 100,
                       maxLines: null,
-                      controller: _introduceCtrl,
+                      controller: _remarksCtrl,
                     ),
                     constraints: BoxConstraints(maxHeight: 100),
                   )
@@ -138,12 +147,71 @@ class EditCustomerState extends State<EditCustomerPage> {
                   "保存",
                   style: TextStyle(color: Colors.white),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  String name = _nameCtrl.text.trim();
+                  if (name == "") {
+                    showToast("请填写会员姓名");
+                    return;
+                  }
+                  String phoneNum = _phoneCtrl.text.trim();
+                  if (phoneNum == "") {
+                    showToast("请填写会员手机号");
+                    return;
+                  }
+                  if(phoneNum.length < 11){
+                    showToast("手机号错误，请检查");
+                    return;
+                  }
+                  String remarks = _remarksCtrl.text.trim();
+                  if(_customer == null){
+                    _customer = Customer();
+                  }
+                  _customer.name = name;
+                  _customer.phoneNum = phoneNum;
+                  _customer.remarks = remarks;
+                  _customer.joinTime = joinTime;
+                  _customer.birthday = birthday;
+                  _customer.sex = sex;
+                  _uploadPic(_customer);
+                },
               ),
             )
-          ])),
+          ]))),
           padding: EdgeInsets.fromLTRB(0, 32, 0, 0),
         ));
+  }
+
+  void _uploadPic(Customer customer) {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return LoadingDialog(
+            text: "保存中…",
+          );
+        });
+    if (croppedFile != null) {
+      RestClient().uploadFile(croppedFile, "store.png", (data) {
+        customer.headIcon = data;
+        customer.localUrl = localFilePath;
+        _saveCustomer(customer);
+      }, (errorCode, description) {
+        Navigator.pop(context);
+        showToast(description);
+      });
+    } else {
+      _saveCustomer(customer);
+    }
+  }
+
+  void _saveCustomer(Customer customer){
+    RestClient().saveCustomer(true,customer, _store.id, (data) {
+      Navigator.pop(context);
+      Navigator.pop(context, customer);
+    }, (errorCode, description) {
+      Navigator.pop(context);
+      showToast(description);
+    });
   }
 
   void clickHeadPhoto(){
@@ -166,7 +234,7 @@ class EditCustomerState extends State<EditCustomerPage> {
   }
 
   void _cropImage(File image) async {
-    var croppedFile = await ImageCropper.cropImage(
+    croppedFile = await ImageCropper.cropImage(
         sourcePath: image.path,
         maxHeight: 300,
         maxWidth: 300,
@@ -210,6 +278,7 @@ class EditCustomerState extends State<EditCustomerPage> {
           DateTime.now().millisecondsSinceEpoch.toString() +
           ".jpg");
       bool isExit = await file.exists();
+      localFilePath = file.path;
       if (!isExit) {
         var createdFile = await file.create();
         var data = await croppedFile.readAsBytes();
@@ -244,6 +313,7 @@ class EditCustomerState extends State<EditCustomerPage> {
    showDatePicker((date) {
      setState(() {
        birthStr = "${date.year}-${date.month}-${date.day}";
+       birthday = date.millisecondsSinceEpoch;
      });
    });
   }
@@ -262,6 +332,7 @@ class EditCustomerState extends State<EditCustomerPage> {
     showDatePicker((date) {
       setState(() {
         joinTimeStr = "${date.year}-${date.month}-${date.day}";
+        joinTime = date.millisecondsSinceEpoch;
       });
     });
   }

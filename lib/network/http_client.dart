@@ -2,11 +2,13 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:catmaster_app/constants.dart';
+import 'package:catmaster_app/entity/customer.dart';
 import 'package:catmaster_app/entity/result.dart';
 import 'package:catmaster_app/entity/store.dart';
 import 'package:catmaster_app/utils/secret_util.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class RestClient {
   static const int TYPE_GET = 1;
@@ -41,6 +43,28 @@ class RestClient {
         "Role":"manager"});
     doRequest(
         TYPE_POST, null, Constants.LOGIN_URL, formData, onSuccess, onFail);
+  }
+
+  void getCustomer(String storeId,HttpSuccess onSuccess,HttpFail onFail){
+    getToken((token) {
+      var heads = {"Token": token};
+      FormData formData = FormData.from({
+        "StoreId": storeId
+      });
+      doRequest(TYPE_GET, heads, Constants.GET_CUSTOMER_URL, formData, onSuccess, onFail);
+    });
+  }
+
+  void saveCustomer(bool isCreate,Customer customer,String storeId,HttpSuccess onSuccess,HttpFail onFail){
+    getToken((token) {
+      var heads = {"Token": token};
+      FormData formData = FormData.from({
+        "Customer": json.encode(customer),
+        "StoreId": storeId,
+        "IsCreate":isCreate
+      });
+      doRequest(TYPE_POST, heads, Constants.SAVE_CUSTOMER_URL, formData, onSuccess, onFail);
+    });
   }
 
   void refreshToken(HttpSuccess onSuccess, HttpFail onFail) {

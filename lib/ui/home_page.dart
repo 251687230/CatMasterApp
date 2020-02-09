@@ -70,7 +70,7 @@ class _HomeState extends State<HomePage> {
         Constants.KEY_SELECT_STORE);
     List decodeJson = json.decode(storeStr);
     setState(() {
-      stores = decodeJson.map((m) => new Store.fromJson(m)).toList();
+      stores = decodeJson.map((m) =>  Store.fromJson(m)).toList();
       if (stores != null && stores.length > 0) {
         Store store;
         if (selectStoreId == null) {

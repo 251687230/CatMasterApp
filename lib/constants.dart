@@ -6,7 +6,7 @@ class Constants{
 
   static const String VERIFE_KEY = "zous.catmaster@2019";
 
-  static const String BASE_URL = "http://192.168.0.103:80";
+  static const String BASE_URL = "http://192.168.0.104:80";
 
   static const String LOGIN_URL = BASE_URL + "/account/login";
 
@@ -23,6 +23,10 @@ class Constants{
   static const String DOWNLOAD_FILE_URL = BASE_URL + "/file/download";
 
   static const String SAVE_STORE_URL = BASE_URL + "/business/saveStore";
+
+  static const String SAVE_CUSTOMER_URL = BASE_URL + "/business/saveCustomer";
+
+  static const String GET_CUSTOMER_URL = BASE_URL + "/business/getCustomers";
 
   static const String REFRESH_TOKEN_URL = BASE_URL + "/account/refreshToken";
 
