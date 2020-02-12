@@ -1,6 +1,8 @@
 import 'package:azlistview/azlistview.dart';
 
 class Customer extends ISuspensionBean{
+  String accountId;
+  String storeId;
   String name;
   int sex;
   String phoneNum;
@@ -14,6 +16,8 @@ class Customer extends ISuspensionBean{
   int credit = 0;
 
   Customer({
+    this.accountId,
+    this.storeId,
     this.name,
     this.sex,
     this.phoneNum,
@@ -24,7 +28,7 @@ class Customer extends ISuspensionBean{
     this.localUrl});
 
   factory Customer.fromJson(Map<String,dynamic> map){
-    return Customer(name:map['name'],
+    return Customer(accountId:map['accountId'],storeId:map['storeId'],name:map['name'],
     sex:map['sex'],phoneNum:map['phoneNum'],
     birthday:map['birthday'],joinTime:map['joinTime'],
     remarks:map['remarks'],headIcon:map['headIcon'],
@@ -36,6 +40,8 @@ class Customer extends ISuspensionBean{
 
   Map<String,dynamic> toJson(){
     Map<String,dynamic> map = Map();
+    map['storeId'] = storeId;
+    map['accountId'] = accountId;
     map['name'] = name;
     map['sex'] = sex;
     map['phoneNum'] = phoneNum;

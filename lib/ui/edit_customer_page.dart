@@ -166,6 +166,7 @@ class EditCustomerState extends State<EditCustomerPage> {
                   if(_customer == null){
                     _customer = Customer();
                   }
+                  _customer.storeId = _store.id;
                   _customer.name = name;
                   _customer.phoneNum = phoneNum;
                   _customer.remarks = remarks;
@@ -205,7 +206,7 @@ class EditCustomerState extends State<EditCustomerPage> {
   }
 
   void _saveCustomer(Customer customer){
-    RestClient().saveCustomer(true,customer, _store.id, (data) {
+    RestClient().saveCustomer(true,customer, (data) {
       Navigator.pop(context);
       Navigator.pop(context, customer);
     }, (errorCode, description) {
@@ -302,7 +303,7 @@ class EditCustomerState extends State<EditCustomerPage> {
             onItemClickListener: (index) async {
               Navigator.pop(context);
               setState(() {
-                sex = index;
+                sex = index -1 ;
               });
             },
           );

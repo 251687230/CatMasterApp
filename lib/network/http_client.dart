@@ -55,12 +55,11 @@ class RestClient {
     });
   }
 
-  void saveCustomer(bool isCreate,Customer customer,String storeId,HttpSuccess onSuccess,HttpFail onFail){
+  void saveCustomer(bool isCreate,Customer customer,HttpSuccess onSuccess,HttpFail onFail){
     getToken((token) {
       var heads = {"Token": token};
       FormData formData = FormData.from({
         "Customer": json.encode(customer),
-        "StoreId": storeId,
         "IsCreate":isCreate
       });
       doRequest(TYPE_POST, heads, Constants.SAVE_CUSTOMER_URL, formData, onSuccess, onFail);

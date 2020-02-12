@@ -40,6 +40,8 @@ class Constants{
 
   static const String KEY_TOKEN = "token";
 
+  static const String KEY_MANAGER = "manager";
+
   static const String KEY_TOKEN_SAVE = "token_save";
 
   static const String KEY_SELECT_STORE = "select_store";

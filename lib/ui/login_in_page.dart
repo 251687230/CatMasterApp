@@ -196,7 +196,7 @@ class LoginFieldState extends State<LoginField> {
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setString(Constants.KEY_TOKEN, jsonData["sessionToken"]);
-    print("Token = " +jsonData["sessionToken"]);
+    sharedPreferences.setString(Constants.KEY_MANAGER, jsonData["manager"]);
     sharedPreferences.setInt(Constants.KEY_TOKEN_SAVE, DateTime.now().millisecondsSinceEpoch);
     sharedPreferences.setString(Constants.KEY_STORES, jsonData["stores"]);
   }

@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:azlistview/azlistview.dart';
 import 'package:catmaster_app/entity/customer.dart';
 import 'package:catmaster_app/entity/store.dart';
 import 'package:catmaster_app/network/http_client.dart';
+import 'package:catmaster_app/ui/customer_manager_page.dart';
 import 'package:catmaster_app/ui/edit_customer_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -63,93 +66,104 @@ class _CustomerListState extends State<CustomerListPage> {
   }
 
   Widget _createListBody() {
-    return AzListView(
-      data: _customers,
-      topData: null,
-      itemBuilder: (context, model) {
-        Customer customer = model;
-        String localUrl = customer.localUrl;
-        String susTag = model.getSuspensionTag();
-        return Column(
-          children: <Widget>[
-            Offstage(
-              offstage: model.isShowSuspension != true,
-              child: _buildSusWidget(susTag),
-            ),
-            GestureDetector(child: Padding(
-              child: Row(
-                children: <Widget>[
-                  localUrl == null
-                      ? SvgPicture.asset(
-                          "assets/customer_header.svg",
-                          width: 50,
-                          height: 50,
-                        )
-                      : CircleAvatar(
-                          backgroundImage: Image.file(
-                            croppedFile,
-                            width: 50,
-                            height: 50,
-                          ).image,
-                          radius: 25,
-                        ),
-                  Padding(
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Padding(
-                              child: Text(
-                                customer.name,
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              padding: EdgeInsets.fromLTRB(0, 0, 16, 0),
-                            ),
-                            SvgPicture.asset(
-                              customer.sex == 0
-                                  ? "assets/woman.svg"
-                                  : "assets/man.svg",
-                              width: 16,
-                              height: 16,
-                            )
-                          ],
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Text(
-                              "积分：   ",
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                            Text(
-                              customer.credit.toString(),
-                              style: TextStyle(color: Colors.grey),
-                            )
-                          ],
-                          mainAxisAlignment: MainAxisAlignment.start,
-                        )
-                      ],
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                    ),
-                    padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
-                  )
-                ],
+    return Column(children: <Widget>[
+      Padding(child:Row(children: <Widget>[
+        Expanded(child:Divider(height: 1,color:Colors.grey)),
+        Expanded(child:Text("共${_customers.length}名会员",textAlign: TextAlign.center,)),
+        Expanded(child:Divider(height: 1,color:Colors.grey)),
+      ],),
+      padding: EdgeInsets.fromLTRB(32, 8, 32, 8),),
+      Expanded(child:AzListView(
+        data: _customers,
+        topData: null,
+        itemBuilder: (context, model) {
+          Customer customer = model;
+          String localUrl = customer.localUrl;
+          String susTag = model.getSuspensionTag();
+          return Column(
+            children: <Widget>[
+              Offstage(
+                offstage: model.isShowSuspension != true,
+                child: _buildSusWidget(susTag),
               ),
-              padding: EdgeInsets.all(16),
-            ),onTap: (){
-
-            },)
-          ],
-        );
-      },
-      suspensionWidget: null,
-      isUseRealIndex: true,
-      itemHeight: 100,
-      suspensionHeight: 100,
-      onSusTagChanged: null,
-      //showCenterTip: false,
-    );
+              GestureDetector(child: Container(
+                child: Row(
+                  children: <Widget>[
+                    localUrl == null
+                        ? SvgPicture.asset(
+                      "assets/customer_header.svg",
+                      width: 50,
+                      height: 50,
+                    )
+                        : CircleAvatar(
+                      backgroundImage: Image.file(
+                        File(localUrl),
+                        width: 50,
+                        height: 50,
+                      ).image,
+                      radius: 25,
+                    ),
+                    Padding(
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Padding(
+                                child: Text(
+                                  customer.name,
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                                padding: EdgeInsets.fromLTRB(0, 0, 16, 0),
+                              ),
+                              SvgPicture.asset(
+                                customer.sex == 0
+                                    ? "assets/woman.svg"
+                                    : "assets/man.svg",
+                                width: 16,
+                                height: 16,
+                              )
+                            ],
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.max,
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Text(
+                                "积分：   ",
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                              Text(
+                                customer.credit.toString(),
+                                style: TextStyle(color: Colors.grey),
+                              )
+                            ],
+                            mainAxisAlignment: MainAxisAlignment.start,
+                          )
+                        ],
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                      ),
+                      padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
+                    )
+                  ],mainAxisSize: MainAxisSize.max,
+                ),
+                padding: EdgeInsets.all(16),
+              ),onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder:
+                (ctx){
+                  return CustomerManagerPage(customer);
+                }));
+              }, behavior: HitTestBehavior.opaque,)
+            ],
+          );
+        },
+        suspensionWidget: null,
+        isUseRealIndex: true,
+        itemHeight: 100,
+        suspensionHeight: 100,
+        onSusTagChanged: null,
+        //showCenterTip: false,
+      ),flex: 1,)
+    ],);
   }
 
   Widget _buildSusWidget(String susTag) {
@@ -221,9 +235,7 @@ class _CustomerListState extends State<CustomerListPage> {
 }
 
 class searchBarDelegate extends SearchDelegate<String> {
-  static const searchList = [];
 
-  static const recentSuggest = [];
 
   //初始化加载
   @override
@@ -247,37 +259,88 @@ class searchBarDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    return Container(
-      width: 100.0,
-      height: 100.0,
-      child: Card(
-        color: Colors.redAccent,
-        child: Center(
-          child: Text(query),
-        ),
-      ),
-    );
+    return _doQuery();
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    final suggestionList = query.isEmpty
-        ? recentSuggest
-        : searchList.where((input) => input.startsWith(query)).toList();
+    return _doQuery();
+  }
+
+  Widget _doQuery(){
+    List<Customer> suggestionList = query.isEmpty
+        ? List()
+        : _customers.where((customer) {
+      return customer.name.contains(query);
+    }).toList();
     return ListView.builder(
-      itemCount: suggestionList.length,
-      itemBuilder: (context, index) => ListTile(
-        title: RichText(
-            text: TextSpan(
-                text: suggestionList[index].substring(0, query.length),
-                style:
-                    TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                children: [
-              TextSpan(
-                  text: suggestionList[index].substring(query.length),
-                  style: TextStyle(color: Colors.grey))
-            ])),
-      ),
+        itemCount: suggestionList.length,
+        itemBuilder: (context, index)
+        {
+          Customer customer = suggestionList[index];
+          String localUrl = customer.localUrl;
+          return Padding(child:Row(
+            children: <Widget>[
+              localUrl == null
+                  ? SvgPicture.asset(
+                "assets/customer_header.svg",
+                width: 50,
+                height: 50,
+              )
+                  : CircleAvatar(
+                backgroundImage: Image
+                    .file(
+                  File(localUrl),
+                  width: 50,
+                  height: 50,
+                )
+                    .image,
+                radius: 25,
+              ),
+              Padding(
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Padding(
+                          child: Text(
+                            customer.name,
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          padding: EdgeInsets.fromLTRB(0, 0, 16, 0),
+                        ),
+                        SvgPicture.asset(
+                          customer.sex == 0
+                              ? "assets/woman.svg"
+                              : "assets/man.svg",
+                          width: 16,
+                          height: 16,
+                        )
+                      ],
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Text(
+                          "手机：   ",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        Text(
+                          customer.phoneNum.toString(),
+                          style: TextStyle(color: Colors.grey),
+                        )
+                      ],
+                      mainAxisAlignment: MainAxisAlignment.start,
+                    )
+                  ],
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                ),
+                padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
+              )
+            ],
+          ), padding: EdgeInsets.fromLTRB(16, 8, 8, 16),);
+        }
     );
   }
 }
